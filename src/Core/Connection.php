@@ -3,6 +3,10 @@
 namespace Stutter\Core;
 
 use Couchbase\QueryException;
+use InvalidArgumentException;
+use PDO;
+use PDOException;
+use RuntimeException;
 
 class Connection
 {
@@ -26,7 +30,7 @@ class Connection
                 $this->config['options'] ?? [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
             );
         } catch (PDOException $e) {
-            throw new \RuntimeException("Database connection failed: {$e->getMessage()}");
+            throw new RuntimeException("Database connection failed: {$e->getMessage()}");
         }
     }
 
@@ -39,7 +43,7 @@ class Connection
             'pgsql' => "pgsql:host={$this->config['host']};dbname={$this->config['database']};user={$this->config['username']};password={$this->config['password']}",
 
             // Add other drivers as needed
-            default => throw new \InvalidArgumentException("Unsupported driver: {$driver}")
+            default => throw new InvalidArgumentException("Unsupported driver: {$driver}")
         };
     }
 

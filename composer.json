@@ -1,0 +1,16 @@
+{
+    "name": "drahil/stutter",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "drahil\\Stutter\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Omar Djecevic",
+            "email": "djecevic.omar@gmail.com"
+        }
+    ],
+    "require": {}
+}
