@@ -1,8 +1,8 @@
 <?php
 
-namespace Stutter\Core;
+namespace drahil\Stutter\Core;
 
-use Couchbase\QueryException;
+use drahil\Stutter\Exceptions\QueryException;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -39,7 +39,7 @@ class Connection
         $driver = $this->config['driver'] ?? 'mysql';
 
         return match ($driver) {
-            'mysql' => "mysql:host={$this->config['host']};dbname={$this->config['database']};charset='utf8mb4'",
+            'mysql' => "mysql:host={$this->config['host']};dbname={$this->config['database']};",
             'pgsql' => "pgsql:host={$this->config['host']};dbname={$this->config['database']};user={$this->config['username']};password={$this->config['password']}",
 
             // Add other drivers as needed

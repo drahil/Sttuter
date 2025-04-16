@@ -1,6 +1,6 @@
 <?php
 
-namespace Stutter\Core;
+namespace drahil\Stutter\Core;
 
 class ConnectionManager
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Stutter\Core;
+namespace drahil\Stutter\Core;
 
 abstract class Model
 {
@@ -16,36 +16,88 @@ abstract class Model
         $this->syncOriginal();
     }
 
-    //   fill
+    public function fill(array $attributes): self
+    {
+        foreach ($attributes as $key => $value) {
+            $this->setAttribute($key, $value);
+        }
 
-    //   setAttribute
+        return $this;
+    }
 
-    //   getAttribute
+    public function setAttribute(string $key, $value): void
+    {
+        $this->attributes[$key] = $value;
+    }
 
-    //   __get
+    public function getAttribute(string $key)
+    {
+        return $this->attributes[$key] ?? null;
+    }
 
-    //   __set
+    public function __get(string $key)
+    {
+        return $this->getAttribute($key);
+    }
 
-    //   syncOriginal
+    public function __set(string $key, $value): void
+    {
+        $this->setAttribute($key, $value);
+    }
 
-    //   isDirty
+    protected function syncOriginal(): void
+    {
+        $this->original = $this->attributes;
+    }
 
-    //   getDirtyAttributes
+    public function isDirty(): bool
+    {
+        return $this->getDirtyAttributes() !== [];
+    }
 
-    //   getConnection
+    public function getDirtyAttributes(): array
+    {
+        return array_diff_assoc($this->attributes, $this->original);
+    }
 
-    //   getTable
+    public static function getConnection(): Connection
+    {
+        return ConnectionManager::getConnection(static::$connection);
+    }
 
-    //   query
+    public static function getTable(): string
+    {
+        return static::$table;
+    }
 
-    //   all
+    public static function query(): QueryBuilder
+    {
+        return new QueryBuilder(static::getConnection(), static::getTable());
+    }
 
-    //   find
+    public static function all(): array
+    {
+        $models = [];
+        $results = self::query()->get();
+
+        foreach ($results as $result) {
+            $models[] = new static($result);
+        }
+
+        return $models;
+    }
+
+    public static function find(int $id)
+    {
+        return self::query()->find($id);
+    }
 
     //   findOrFail
 
-    //   where
-
+    public static function where($column, $operator = null, $value = null): QueryBuilder
+    {
+        return static::query()->where($column, $operator, $value);
+    }
     //   save
 
     //   insert
@@ -53,5 +105,14 @@ abstract class Model
     //   update
 
     //   delete
+    public function delete(): bool
+    {
+        if (!isset($this->attributes[$this->primaryKey])) {
+            return false;
+        }
 
+        return static::query()
+                ->where($this->primaryKey, $this->attributes[$this->primaryKey])
+                ->delete() > 0;
+    }
 }
