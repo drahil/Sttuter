@@ -3,6 +3,7 @@
 namespace drahil\Stutter\Core;
 
 use drahil\Stutter\Exceptions\ModelNotFoundException;
+use drahil\Stutter\Relations\HasOne;
 
 abstract class Model
 {
@@ -119,7 +120,6 @@ abstract class Model
         return static::find($id);
     }
 
-
     public function update(array $attributes): static
     {
         static::query()
@@ -147,5 +147,12 @@ abstract class Model
     {
         $fresh = static::find($this->attributes[$this->primaryKey]);
         $this->attributes = $fresh->attributes;
+    }
+
+    public function hasOne(string $relatedClass, string $foreignKey = null, string $localKey = 'id'): HasOne
+    {
+        $foreignKey = $foreignKey ?? strtolower((new \ReflectionClass($this))->getShortName()) . '_id';
+
+        return new HasOne($this, $relatedClass, $foreignKey, $localKey);
     }
 }
