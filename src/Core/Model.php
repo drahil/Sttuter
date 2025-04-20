@@ -2,6 +2,8 @@
 
 namespace drahil\Stutter\Core;
 
+use drahil\Stutter\Exceptions\ModelNotFoundException;
+
 abstract class Model
 {
     protected static string $table;
@@ -87,24 +89,49 @@ abstract class Model
         return $models;
     }
 
-    public static function find(int $id)
+    public static function find(int $id): ?static
     {
-        return self::query()->find($id);
+        $result = self::query()->find($id);
+
+        return $result ? new static($result) : null;
     }
 
-    //   findOrFail
+    public static function findOrFail(int $id): static
+    {
+        $model = static::find($id);
+
+        if ($model === null) {
+            throw new ModelNotFoundException("No query results for model [" . static::class . "] $id");
+        }
+
+        return $model;
+    }
 
     public static function where($column, $operator = null, $value = null): QueryBuilder
     {
         return static::query()->where($column, $operator, $value);
     }
-    //   save
 
-    //   insert
+    public static function create(array $attributes): static
+    {
+        $id = static::query()->insert($attributes);
 
-    //   update
+        return static::find($id);
+    }
 
-    //   delete
+
+    public function update(array $attributes): static
+    {
+        static::query()
+                ->where($this->primaryKey, $this->attributes[$this->primaryKey])
+                ->update($attributes);
+
+        $this->refresh();
+        $this->syncOriginal();
+
+        return $this;
+    }
+
     public function delete(): bool
     {
         if (!isset($this->attributes[$this->primaryKey])) {
@@ -114,5 +141,11 @@ abstract class Model
         return static::query()
                 ->where($this->primaryKey, $this->attributes[$this->primaryKey])
                 ->delete() > 0;
+    }
+
+    public function refresh()
+    {
+        $fresh = static::find($this->attributes[$this->primaryKey]);
+        $this->attributes = $fresh->attributes;
     }
 }

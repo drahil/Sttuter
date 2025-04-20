@@ -106,12 +106,20 @@ class QueryBuilder
         return (int) $this->connection->lastInsertId();
     }
 
-//    public function update(array $values): int
-//    {
-//        $columns = array_keys($values);
-//        $parameters = array_fill(0, count($values), '?');
-//
-//    }
+    public function update(array $values): int
+    {
+        $sql = "UPDATE {$this->table} SET ";
+        $columns = array_keys($values);
+        $parameters = array_fill(0, count($values), '?');
+
+        foreach ($columns as $index => $column) {
+            $sql .= "{$column} = {$parameters[$index]}, ";
+        }
+
+        $sql = rtrim($sql, ', ') . " WHERE " . $this->wheres[0]['column'] . " = ?;";
+
+        return $this->connection->execute($sql, array_merge(array_values($values), [$this->wheres[0]['value']]));
+    }
 
     public function delete(): int
     {
