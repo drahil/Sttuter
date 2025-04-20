@@ -3,6 +3,7 @@
 namespace drahil\Stutter\Core;
 
 use drahil\Stutter\Exceptions\ModelNotFoundException;
+use drahil\Stutter\Relations\BelongsTo;
 use drahil\Stutter\Relations\HasOne;
 
 abstract class Model
@@ -154,5 +155,12 @@ abstract class Model
         $foreignKey = $foreignKey ?? strtolower((new \ReflectionClass($this))->getShortName()) . '_id';
 
         return new HasOne($this, $relatedClass, $foreignKey, $localKey);
+    }
+
+    public function belongsTo(string $relatedClass, string $foreignKey = null, string $localKey = 'id'): BelongsTo
+    {
+        $foreignKey = $foreignKey ?? strtolower((new \ReflectionClass($this))->getShortName()) . '_id';
+
+        return new BelongsTo($this, $relatedClass, $foreignKey, $localKey);
     }
 }
