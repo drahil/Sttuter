@@ -27,14 +27,19 @@ class QueryBuilder
         return $this;
     }
 
-    public function where(string $column, ?string $operator = null, mixed $value = null): static
+    public function where($column, $operator = null, $value = null): self
     {
         if ($value === null) {
             $value = $operator;
             $operator = '=';
         }
 
-        $this->wheres[] = compact('column', 'operator', 'value');
+        $this->wheres[] = [
+            'type' => 'basic',
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value
+        ];
         $this->bindings[] = $value;
 
         return $this;
@@ -58,14 +63,10 @@ class QueryBuilder
         return $this;
     }
 
-    // public function join(string $table, string $column, string $operator = '=', string $type = 'INNER'): static
-
-    // group by
-
-    // get
     public function get(): array
     {
         $sql = $this->toSql();
+
         return $this->connection->query($sql, $this->bindings);
     }
 
@@ -169,13 +170,14 @@ class QueryBuilder
         $whereParts = [];
 
         foreach ($this->wheres as $where) {
-            $whereParts[] = "{$where['column']} {$where['operator']} ?";
+            $whereParts[] = match ($where['type']) {
+                'raw', 'in' => $where['sql'],
+                default => "{$where['column']} {$where['operator']} ?",
+            };
         }
 
         return implode(' AND ', $whereParts);
     }
-
-    // compileJoins
 
     protected function compileOrders(): string
     {
@@ -187,4 +189,30 @@ class QueryBuilder
 
         return implode(', ', $orderParts);
     }
+
+    public function whereIn(string $column, array $values): self
+    {
+        if (empty($values)) {
+            $this->wheres[] = [
+                'type' => 'raw',
+                'sql' => '0 = 1'
+            ];
+            return $this;
+        }
+
+        $placeholders = array_fill(0, count($values), '?');
+
+        $this->wheres[] = [
+            'type' => 'in',
+            'column' => $column,
+            'sql' => "$column IN (" . implode(', ', $placeholders) . ")"
+        ];
+
+        foreach ($values as $value) {
+            $this->bindings[] = $value;
+        }
+
+        return $this;
+    }
+
 }

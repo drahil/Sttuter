@@ -4,6 +4,7 @@ namespace drahil\Stutter\Core;
 
 use drahil\Stutter\Exceptions\ModelNotFoundException;
 use drahil\Stutter\Relations\BelongsTo;
+use drahil\Stutter\Relations\BelongsToMany;
 use drahil\Stutter\Relations\HasMany;
 use drahil\Stutter\Relations\HasOne;
 
@@ -125,8 +126,8 @@ abstract class Model
     public function update(array $attributes): static
     {
         static::query()
-                ->where($this->primaryKey, $this->attributes[$this->primaryKey])
-                ->update($attributes);
+            ->where($this->primaryKey, $this->attributes[$this->primaryKey])
+            ->update($attributes);
 
         $this->refresh();
         $this->syncOriginal();
@@ -170,5 +171,10 @@ abstract class Model
         $foreignKey = $foreignKey ?? strtolower((new \ReflectionClass($this))->getShortName()) . '_id';
 
         return new HasMany($this, $relatedClass, $foreignKey, $localKey);
+    }
+
+    public function belongsToMany(string $relatedClass, string $pivotTable, string $parentKey, string $relatedKey): BelongsToMany
+    {
+        return new BelongsToMany($this, $relatedClass, $parentKey, $relatedKey, $pivotTable);
     }
 }
