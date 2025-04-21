@@ -34,6 +34,5 @@ abstract class Relation
         return $this->query;
     }
 
-    abstract public function get(): array;
-
+    abstract public function get(): null|array|Model;
 }

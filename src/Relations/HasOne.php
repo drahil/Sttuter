@@ -13,14 +13,14 @@ class HasOne extends Relation
         $this->query->where($this->foreignKey, $this->parent->{$this->localKey});
     }
 
-    public function get(): array
+    public function get(): Model|null
     {
         $result = $this->query->first();
 
         if (!$result) {
-            return [];
+            return null;
         }
 
-        return [new $this->relatedClass($result)];
+        return new $this->relatedClass($result);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace drahil\Stutter\Relations;
 
+use drahil\Stutter\Core\Model;
+
 class BelongsTo extends Relation
 {
 
@@ -12,14 +14,14 @@ class BelongsTo extends Relation
         $this->query->where($this->localKey, $this->parent->{$this->foreignKey});
     }
 
-    public function get(): array
+    public function get(): Model|null
     {
         $result = $this->query->first();
 
         if (!$result) {
-            return [];
+            return null;
         }
 
-        return [new $this->relatedClass($result)];
+        return new $this->relatedClass($result);
     }
 }
