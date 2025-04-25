@@ -1,6 +1,8 @@
 {
     "name": "drahil/stutter",
+    "description": "A lightweight, elegant ORM for PHP with intuitive relationship management.",
     "type": "library",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "drahil\\Stutter\\": "src/"
@@ -12,5 +14,9 @@
             "email": "djecevic.omar@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "php": ">=8.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
