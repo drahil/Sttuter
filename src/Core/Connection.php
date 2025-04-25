@@ -40,7 +40,11 @@ class Connection
 
         return match ($driver) {
             'mysql' => "mysql:host={$this->config['host']};dbname={$this->config['database']};",
-            'pgsql' => "pgsql:host={$this->config['host']};dbname={$this->config['database']};user={$this->config['username']};password={$this->config['password']}",
+            'pgsql' =>
+                "pgsql:host={$this->config['host']};"
+                . "dbname={$this->config['database']};"
+                . "user={$this->config['username']};"
+                . "password={$this->config['password']}",
 
             // Add other drivers as needed
             default => throw new InvalidArgumentException("Unsupported driver: {$driver}")
