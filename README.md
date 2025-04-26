@@ -187,6 +187,14 @@ $profile = User::find(1)->profile()->get();
 
 // Get a profile's user
 $user = Profile::find(1)->user()->get();
+```` 
+##### Create Related Record
+
+```php
+// Create a profile for a user
+$profile = User::find(1)->profile()->create([
+    'bio' => 'New bio for user'
+]);
 ```
 
 #### One-to-Many
@@ -199,6 +207,15 @@ $posts = User::find(1)->posts()->get();
 $user = Post::find(1)->user()->get();
 ```
 
+##### Create Related Records
+
+```php
+// Create a profile for a user
+$profile = User::find(1)->profile()->create([
+    'bio' => 'New bio for user'
+]);
+```
+
 #### Many-to-Many
 
 ```php
@@ -208,6 +225,20 @@ $tags = Post::find(1)->tags()->get();
 // Get a tag's posts
 $posts = Tag::find(1)->posts()->get();
 ```
+
+##### Attach Related Records
+
+```php
+// Attach tags to a post
+Post::find(1)->tags()->attach([1, 2, 3]);
+````
+
+##### Detach Related Records
+
+```php
+// Detach tags from a post
+Post::find(1)->tags()->detach([2, 3]);
+````
 
 ## Full Example
 
