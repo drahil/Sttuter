@@ -18,13 +18,13 @@ class BelongsToMany extends Relation
         $this->relatedKey = $relatedKey;
         $this->pivotTable = $pivotTable;
 
+        $this->query = new QueryBuilder(ConnectionManager::getConnection(), $this->pivotTable);
+
         parent::__construct($parent, $relatedClass);
     }
 
     protected function initializeQuery(): void
     {
-        $connection = ConnectionManager::getConnection();
-        $this->query = new QueryBuilder($connection, $this->pivotTable);
         $this->query->where($this->parentKey, $this->parent->id)->select([$this->relatedKey]);
     }
 
@@ -39,5 +39,39 @@ class BelongsToMany extends Relation
         $relatedIds = array_column($pivotResults, $this->relatedKey);
 
         return $this->relatedClass::query()->whereIn('id', $relatedIds)->get();
+    }
+
+    public function attach(array $relatedIds): ?array
+    {
+        foreach ($relatedIds as $relatedId) {
+            $this->attachSingle($relatedId);
+        }
+
+        return $this->get();
+    }
+
+    private function attachSingle(mixed $relatedId): void
+    {
+        $this->query->insert([
+            $this->parentKey => $this->parent->id,
+            $this->relatedKey => $relatedId,
+        ]);
+    }
+
+    public function detach(array $relatedIds): ?array
+    {
+        foreach ($relatedIds as $relatedId) {
+            $this->detachSingle($relatedId);
+        }
+
+        return $this->get();
+    }
+
+    private function detachSingle(mixed $relatedId): void
+    {
+        $query = clone $this->query;
+        $query->where($this->parentKey, $this->parent->id)
+            ->where($this->relatedKey, $relatedId)
+            ->delete();
     }
 }

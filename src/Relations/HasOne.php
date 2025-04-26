@@ -23,4 +23,11 @@ class HasOne extends Relation
 
         return new $this->relatedClass($result);
     }
+
+    public function create(array $attributes): Model
+    {
+        $attributes[$this->foreignKey] = $this->parent->{$this->localKey};
+
+        return $this->relatedClass::create($attributes);
+    }
 }

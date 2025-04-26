@@ -24,4 +24,9 @@ class BelongsTo extends Relation
 
         return new $this->relatedClass($result);
     }
+
+    public function create(array $attributes): Model
+    {
+        return $this->relatedClass::create($attributes);
+    }
 }

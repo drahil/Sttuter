@@ -58,7 +58,7 @@ class Connection
             $statement->execute($bindings);
             return $statement->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            throw new QueryException($sql, $bindings, $e);
+            throw new QueryException($e);
         }
     }
 
@@ -69,7 +69,7 @@ class Connection
             $statement->execute($bindings);
             return $statement->rowCount();
         } catch (PDOException $e) {
-            throw new QueryException($sql, $bindings, $e);
+            throw new QueryException($e);
         }
     }
 

@@ -2,6 +2,8 @@
 
 namespace drahil\Stutter\Relations;
 
+use drahil\Stutter\Core\Model;
+
 class HasMany extends Relation
 {
     protected function initializeQuery(): void
@@ -22,5 +24,12 @@ class HasMany extends Relation
         return array_map(function ($result) {
             return new $this->relatedClass($result);
         }, $results);
+    }
+
+    public function create(array $attributes): Model
+    {
+        $attributes[$this->foreignKey] = $this->parent->{$this->localKey};
+
+        return $this->relatedClass::create($attributes);
     }
 }
